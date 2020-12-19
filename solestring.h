@@ -1,5 +1,5 @@
 #include <string.h>
-#include "hashmap.h"
+#include "hashmap.c"
 
 struct solestr {
     char* value;
