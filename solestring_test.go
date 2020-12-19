@@ -1,4 +1,4 @@
-package oncestring
+package solestring
 
 import (
 	"testing"

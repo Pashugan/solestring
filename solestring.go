@@ -1,4 +1,4 @@
-package oncestring
+package solestring
 
 // #cgo CFLAGS: -std=c99 -g -O2 -Wall -Wpedantic -Wno-unused-variable -Itidwall_hashmap
 // #include <stdlib.h>
