@@ -41,10 +41,12 @@ static uint64_t solestr_hash(const void *item, uint64_t seed0, uint64_t seed1) {
 }
 
 static bool solestr_iter_free(const void *item, void *udata) {
-	const struct solestr *ss = item;
+	struct solestr *ss = (struct solestr *)item;
+	struct hashmap *hmap = udata;
 	if (IS_POINTER(ss->value)) {
 		free(ss->value);
 	}
+	hashmap_delete(hmap, ss);
 	return true;
 }
 
@@ -64,6 +66,6 @@ bool hmap_put(struct hashmap *hmap, char *s) {
 }
 
 void hmap_free(struct hashmap *hmap) {
-	hashmap_scan(hmap, solestr_iter_free, NULL);
+	hashmap_scan(hmap, solestr_iter_free, hmap);
 	hashmap_free(hmap);
 }
