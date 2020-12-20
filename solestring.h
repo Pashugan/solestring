@@ -8,16 +8,18 @@ struct solestr {
 	char* value;
 };
 
-static void solestring_value_pack(char **vp) {
-	size_t len = strlen(*vp);
+static char * solestring_value_pack(char *v) {
+	size_t len = strlen(v);
 	if (len > 6) {
-		return;
+		char *np = (char *)malloc((len+1)*sizeof(char));
+		strncpy(np, v, len+1);
+		return np;
 	}
-	uint64_t i = 1;
-	char *ip = (char *)&i;
-	strncpy(ip+1, *vp, len);
-	*(ip+1+len) = '\0';
-	*vp = (char *)i;
+	char *tp; // tagged pointer
+	char *p = (char *)&tp;
+	*p = 1;
+	strncpy(p+1, v, len+1);
+	return tp;
 }
 
 static char * solestring_value_unpack(char **vp) {
@@ -43,11 +45,10 @@ struct hashmap * hmap_new() {
 
 char * hmap_get(struct hashmap *hmap, char *s) {
 	struct solestr *ss = hashmap_get(hmap, &(struct solestr){ .value=s });
-	return ss ? solestring_value_unpack(&ss->value) : NULL;
+	return ss ? ss->value : NULL;
 }
 
 bool hmap_put(struct hashmap *hmap, char *s) {
-	solestring_value_pack(&s);
-	struct solestr *ss = hashmap_set(hmap, &(struct solestr){ .value=s });
+	struct solestr *ss = hashmap_set(hmap, &(struct solestr){ .value=solestring_value_pack(s) });
 	return ss || !hashmap_oom(hmap);
 }
