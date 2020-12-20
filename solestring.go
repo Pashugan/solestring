@@ -48,8 +48,7 @@ func (o *Store) LoadOrStore(s string) (actual *String, loaded bool) {
 }
 
 func (o *Store) Close() {
-	C.hashmap_clear(o.hmap, true)
-	C.hashmap_free(o.hmap)
+	C.hmap_free(o.hmap)
 }
 
 type String C.char
