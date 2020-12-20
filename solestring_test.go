@@ -13,6 +13,9 @@ func TestFetchSame(t *testing.T) {
 	defer o.Close()
 	p1, _ := o.LoadOrStore(s1)
 	p2, _ := o.LoadOrStore(s2)
+	if p2 != p1 {
+		t.Error("results must point to the same memory")
+	}
 	if p1.Value() != s1 {
 		t.Error("p1 value is wrong")
 	}
