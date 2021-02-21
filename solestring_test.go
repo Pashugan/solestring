@@ -1,8 +1,17 @@
 package solestring
 
 import (
+	"fmt"
 	"testing"
 )
+
+func hexDump(s string) string {
+	out := ""
+	for i := 0; i < len(s); i++ {
+		out += fmt.Sprintf("%02x ", s[i])
+	}
+	return out
+}
 
 func TestFetchSame(t *testing.T) {
 	s1, s2 := "test", "test"
@@ -17,10 +26,10 @@ func TestFetchSame(t *testing.T) {
 		t.Error("results must point to the same memory")
 	}
 	if p1.Value() != s1 {
-		t.Error("p1 value is wrong")
+		t.Errorf("p1 value is wrong: want '%v', got '%v' (hex: %s)", s1, p1.Value(), hexDump(p1.Value()))
 	}
 	if p2.Value() != s2 {
-		t.Error("p2 value is wrong")
+		t.Errorf("p2 value is wrong: want '%v', got '%v' (hex: %s)", s1, p2.Value(), hexDump(p2.Value()))
 	}
 }
 
@@ -37,10 +46,10 @@ func TestFetchNotSame(t *testing.T) {
 		t.Error("results must not point to the same memory")
 	}
 	if p1.Value() != s1 {
-		t.Error("p1 value is wrong")
+		t.Errorf("p1 value is wrong: want '%v', got '%v' (hex: %s)", s1, p1.Value(), hexDump(p1.Value()))
 	}
 	if p2.Value() != s2 {
-		t.Error("p2 value is wrong")
+		t.Errorf("p2 value is wrong: want '%v', got '%v' (hex: %s)", s1, p2.Value(), hexDump(p2.Value()))
 	}
 }
 

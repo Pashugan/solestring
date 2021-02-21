@@ -12,15 +12,15 @@ static char * solestring_value_pack(char *v) {
 	size_t len = strlen(v);
 	// Pointer
 	if (len > sizeof(char *)-2) { // one byte for tag and one for \0
-		char *np = (char *)malloc((len+1)*sizeof(char));
-		strncpy(np, v, len+1);
+		char *np = malloc((len+1)*sizeof(char));
+		memcpy(np, v, len+1);
 		return np;
 	}
 	// Tagged pointer
 	char *tp;
-	char *p = (char *)&tp; // pointer to tag pointer as byte array
+	char *p = (char *)&tp; // reinterpret tag pointer itself as byte array
 	*p = 1; // tag in the first byte (assuming little endian)
-	strncpy(p+1, v, sizeof(tp)-1); // fill up the rest bytes with the string and \0s
+	strncpy(p+1, v, sizeof(char *)-1); // fill up the rest bytes with the string and \0s
 	return tp;
 }
 

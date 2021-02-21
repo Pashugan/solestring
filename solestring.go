@@ -6,7 +6,6 @@ package solestring
 import "C"
 import (
 	"encoding/binary"
-	"strings"
 	"sync"
 	"unsafe"
 )
@@ -63,7 +62,13 @@ func (s *String) Value() string {
 	}
 
 	// Tagged pointer
-	bytes := make([]byte, 8)
+	bytes := make([]byte, unsafe.Sizeof(p))
 	binary.LittleEndian.PutUint64(bytes, uint64(p>>8))
-	return strings.TrimRight(string(bytes), "\x00")
+	var eos int
+	for eos = 0; eos < len(bytes)-1; eos++ {
+		if bytes[eos] == '\x00' {
+			break
+		}
+	}
+	return string(bytes[:eos])
 }
