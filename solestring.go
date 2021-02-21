@@ -23,7 +23,7 @@ type Store struct {
 	mu   sync.RWMutex
 }
 
-func (o *Store) LoadOrStore(s string) (actual *String, loaded bool) {
+func (o *Store) LoadOrStore(s string) (actual String, loaded bool) {
 	cs := C.CString(s)
 	defer C.free(unsafe.Pointer(cs))
 
@@ -36,36 +36,34 @@ func (o *Store) LoadOrStore(s string) (actual *String, loaded bool) {
 		ok := C.hmap_put(o.hmap, cs)
 		o.mu.Unlock()
 		if !ok {
-			return nil, false
+			return 0, false
 		}
 
 		o.mu.RLock()
 		p = C.hmap_get(o.hmap, cs)
 		o.mu.RUnlock()
 
-		return (*String)(p), false
+		return String(unsafe.Pointer(p)), false
 	}
-	return (*String)(p), true
+	return String(unsafe.Pointer(p)), true
 }
 
 func (o *Store) Close() {
 	C.hmap_free(o.hmap)
 }
 
-type String C.char
+type String uintptr
 
-func (s *String) Value() string {
-	cs := (*C.char)(s)
-	p := uintptr(unsafe.Pointer(cs))
-
+func (s String) Value() string {
 	// Pointer
-	if p&1 == 0 {
+	if s&1 == 0 {
+		cs := (*C.char)(unsafe.Pointer(s))
 		return C.GoString(cs)
 	}
 
 	// Tagged pointer
-	bytes := make([]byte, unsafe.Sizeof(p))
-	binary.LittleEndian.PutUint64(bytes, uint64(p>>8))
+	bytes := make([]byte, unsafe.Sizeof(s))
+	binary.LittleEndian.PutUint64(bytes, uint64(s>>8))
 	var eos int
 	for eos = 0; eos < len(bytes)-1; eos++ {
 		if bytes[eos] == '\x00' {
