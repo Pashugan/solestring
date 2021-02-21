@@ -10,11 +10,14 @@ struct solestr {
 
 static char * solestring_value_pack(char *v) {
 	size_t len = strlen(v);
+#ifdef SOLESTRING_PACK
 	// Pointer
 	if (len > sizeof(char *)-2) { // one byte for tag and one for \0
+#endif
 		char *np = malloc((len+1)*sizeof(char));
 		memcpy(np, v, len+1);
 		return np;
+#ifdef SOLESTRING_PACK
 	}
 	// Tagged pointer
 	char *tp;
@@ -22,6 +25,7 @@ static char * solestring_value_pack(char *v) {
 	*p = 1; // tag in the first byte (assuming little endian)
 	strncpy(p+1, v, sizeof(char *)-1); // fill up the rest bytes with the string and \0s
 	return tp;
+#endif
 }
 
 static char * solestring_value_unpack(char **vp) {
