@@ -43,21 +43,21 @@ func (o *Store) LoadOrStore(s string) (actual String, loaded bool) {
 		p = C.hmap_get(o.hmap, cs)
 		o.mu.RUnlock()
 
-		return String(unsafe.Pointer(p)), false
+		return String(uintptr(unsafe.Pointer(p))), false
 	}
-	return String(unsafe.Pointer(p)), true
+	return String(uintptr(unsafe.Pointer(p))), true
 }
 
 func (o *Store) Close() {
 	C.hmap_free(o.hmap)
 }
 
-type String uintptr
+type String uint64
 
 func (s String) Value() string {
 	// Pointer
 	if s&1 == 0 {
-		cs := (*C.char)(unsafe.Pointer(s))
+		cs := (*C.char)(unsafe.Pointer(uintptr(s)))
 		return C.GoString(cs)
 	}
 
