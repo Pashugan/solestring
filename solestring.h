@@ -23,7 +23,7 @@ static char * solestring_value_pack(char *v) {
 	char *tp;
 	char *p = (char *)&tp; // reinterpret tag pointer itself as byte array
 	*p = 1; // tag in the first byte (assuming little endian)
-	strncpy(p+1, v, sizeof(char *)-1); // fill up the rest bytes with the string and \0s
+	memcpy(p+1, v, len+1);
 	return tp;
 #endif
 }
